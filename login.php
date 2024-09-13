@@ -32,7 +32,7 @@ if (isset($_POST['uname']) && isset($_POST['password'])) {
                 $_SESSION['role'] = $row['role'];
 
                 if($row['role'] == 'admin'){
-                    header("Location: admin.php");
+                    header("Location: manage_users.php");
                     exit();
                 }else{
                     header("Location: home.php");

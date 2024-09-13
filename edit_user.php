@@ -71,8 +71,6 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
     <?php include('message.php'); ?>
 
     <div class="row">
-    <a href="pdf_maker.php?user_name=<?php echo $data_row['user_name']; ?>&ACTION=VIEW" class="btn btn-success"><i class="fa fa-file-pdf-o"></i> View PDF</a> &nbsp;&nbsp; 
-    <a href="pdf_maker.php?user_name=<?php echo $data_row['user_name']; ?>&ACTION=DOWNLOAD" class="btn btn-danger"><i class="fa fa-download"></i> Download PDF</a>
     <hr>
         <div class="col-12">
             <h3 class="text-center">Lecturer's Information</h3>
@@ -165,8 +163,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form>
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_subjects.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -202,11 +200,22 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                         echo '
                         <tr>
                             <td class="text-center p-1">'.$i.'</td>
-                            <td class="text-justify">'.$subject["sub_name"].'</td>
-                            <td class="text-center p-1">'.$subject["sarjana_prof"].'</td>
-                            <td class="text-center p-1">'.$subject["sarjana_muda"].'</td>
-                            <td class="text-center p-1">'.$subject["diploma"].'</td>
-                            <td class="text-center p-1">'.$subject["sijil_persediaan"].'</td>
+                            <td class="text-justify">
+                                <input type="text" name="sub_name[]" class="form-control" value="'.htmlspecialchars($subject["sub_name"]).'">
+                                <input type="hidden" name="subject_id[]" value="'.$subject["id"].'">
+                            </td>
+                            <td class="text-center p-1">
+                                <input type="text" name="sarjana_prof[]" class="form-control text-center" value="'.htmlspecialchars($subject["sarjana_prof"]).'">
+                            </td>
+                            <td class="text-center p-1">
+                                <input type="text" name="sarjana_muda[]" class="form-control text-center" value="'.htmlspecialchars($subject["sarjana_muda"]).'">
+                            </td>
+                            <td class="text-center p-1">
+                                <input type="text" name="diploma[]" class="form-control text-center" value="'.htmlspecialchars($subject["diploma"]).'">
+                            </td>
+                            <td class="text-center p-1">
+                                <input type="text" name="sijil_persediaan[]" class="form-control text-center" value="'.htmlspecialchars($subject["sijil_persediaan"]).'">
+                            </td>
                         </tr>';
                         }
                     } else {
@@ -218,6 +227,7 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -228,8 +238,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_qualifications.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -251,33 +261,41 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <?php 
                     $i = 0;
                     if(isset($_GET['user_name'])){
-
                         $aca_name = mysqli_real_escape_string($conn, $_GET['user_name']);
                         $query = "SELECT * FROM aca_qualification WHERE user_name='$aca_name'";
                         $query_run = mysqli_query($conn, $query);
                 
                         if(mysqli_num_rows($query_run) > 0){
-                
                             while($aca = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo '
-                        <tr>
-                            <td class="text-center p-1">'.$i.'</td>
-                            <td class="text-justify">'.$aca["kelulusan"].'</td>
-                            <td class="text-center p-1">'.$aca["bidang"].'</td>
-                            <td class="text-center p-1">'.$aca["ipt_name"].'</td>
-                            <td class="text-center p-1">'.$aca["year"].'</td>
-                        </tr>';
+                                $i++;
+                                echo '
+                                <tr>
+                                    <td class="text-center p-1">'.$i.'</td>
+                                    <td class="text-justify">
+                                        <input type="text" name="kelulusan[]" class="form-control" value="'.htmlspecialchars($aca["kelulusan"]).'">
+                                        <input type="hidden" name="qualification_id[]" value="'.$aca["id"].'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="bidang[]" class="form-control text-center" value="'.htmlspecialchars($aca["bidang"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="ipt_name[]" class="form-control text-center" value="'.htmlspecialchars($aca["ipt_name"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="year[]" class="form-control text-center" value="'.htmlspecialchars($aca["year"]).'">
+                                    </td>
+                                </tr>';
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No qualification found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No qualification found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='6'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -288,8 +306,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_work_exp.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -308,33 +326,39 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <tbody>
                     <?php 
                     $i = 0;
-                    if(isset($_GET['user_name'])){
-
+                    if (isset($_GET['user_name'])) {
                         $exp_work = mysqli_real_escape_string($conn, $_GET['user_name']);
                         $query = "SELECT * FROM work_exp WHERE user_name='$exp_work'";
                         $query_run = mysqli_query($conn, $query);
                 
-                        if(mysqli_num_rows($query_run) > 0){
-                
-                            while($exp = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo '
-                        <tr>
-                            <td class="text-center p-1">'.$i.'</td>
-                            <td class="text-justify">'.$exp["exp_name"].'</td>
-                            <td class="text-center p-1">'.$exp["exp_position"].'</td>
-                            <td class="text-center p-1">'.$exp["exp_date"].'</td>
-                        </tr>';
+                        if (mysqli_num_rows($query_run) > 0) {
+                            while ($exp = mysqli_fetch_array($query_run)) {
+                                $i++;
+                                echo '
+                                <tr>
+                                    <td class="text-center p-1">'.$i.'</td>
+                                    <td class="text-justify">
+                                        <input type="text" name="exp_name[]" class="form-control" value="'.htmlspecialchars($exp["exp_name"]).'">
+                                        <input type="hidden" name="exp_id[]" value="'.$exp["id"].'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="exp_position[]" class="form-control text-center" value="'.htmlspecialchars($exp["exp_position"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="exp_date[]" class="form-control text-center" value="'.htmlspecialchars($exp["exp_date"]).'">
+                                    </td>
+                                </tr>';
+                            }
+                        } else {
+                            echo "<tr><td colspan='4'>No experience found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No experience found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='4'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -345,8 +369,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_research.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -367,34 +391,42 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <tbody>
                     <?php 
                     $i = 0;
-                    if(isset($_GET['user_name'])){
-
+                    if(isset($_GET['user_name'])) {
                         $kerja_selidik = mysqli_real_escape_string($conn, $_GET['user_name']);
                         $query = "SELECT * FROM kerja_selidik WHERE user_name='$kerja_selidik'";
                         $query_run = mysqli_query($conn, $query);
-                
-                        if(mysqli_num_rows($query_run) > 0){
-                
-                            while($selidik = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$selidik[title_selidik]</td>
-                            <td class='text-center p-1'>$selidik[tahun_selidik]</td>
-                            <td class='text-center p-1'>$selidik[hasil_selidik]</td>
-                            <td class='text-center p-1'>$selidik[kewangan_selidik]</td>
-                        </tr>";
+
+                        if(mysqli_num_rows($query_run) > 0) {
+                            while($selidik = mysqli_fetch_array($query_run)) {
+                                $i++;
+                                echo '
+                                <tr>
+                                    <td class="text-center p-1">'.$i.'</td>
+                                    <td class="text-justify">
+                                        <input type="text" name="title_selidik[]" class="form-control" value="'.htmlspecialchars($selidik["title_selidik"]).'">
+                                        <input type="hidden" name="selidik_id[]" value="'.$selidik["id"].'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="tahun_selidik[]" class="form-control text-center" value="'.htmlspecialchars($selidik["tahun_selidik"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="hasil_selidik[]" class="form-control text-center" value="'.htmlspecialchars($selidik["hasil_selidik"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="kewangan_selidik[]" class="form-control text-center" value="'.htmlspecialchars($selidik["kewangan_selidik"]).'">
+                                    </td>
+                                </tr>';
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No research found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No research found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='6'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -405,8 +437,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form action="save_rundingan.php" method="post">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -427,34 +459,42 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <tbody>
                     <?php 
                     $i = 0;
-                    if(isset($_GET['user_name'])){
-
+                    if (isset($_GET['user_name'])) {
                         $kerja_perundingan = mysqli_real_escape_string($conn, $_GET['user_name']);
                         $query = "SELECT * FROM kerja_perundingan WHERE user_name='$kerja_perundingan'";
                         $query_run = mysqli_query($conn, $query);
                 
-                        if(mysqli_num_rows($query_run) > 0){
-                
-                            while($runding = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$runding[title_runding]</td>
-                            <td class='text-center p-1'>$runding[tahun_runding]</td>
-                            <td class='text-center p-1'>$runding[hasil_runding]</td>
-                            <td class='text-center p-1'>$runding[kewangan_runding]</td>
-                        </tr>";
+                        if (mysqli_num_rows($query_run) > 0) {
+                            while ($runding = mysqli_fetch_array($query_run)) {
+                                $i++;
+                                echo "
+                                <tr>
+                                    <td class='text-center p-1'>$i</td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='title_runding[]' class='form-control' value='".htmlspecialchars($runding['title_runding'])."'>
+                                        <input type='hidden' name='runding_id[]' value='".$runding['id']."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='tahun_runding[]' class='form-control text-center' value='".htmlspecialchars($runding['tahun_runding'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='hasil_runding[]' class='form-control text-center' value='".htmlspecialchars($runding['hasil_runding'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='kewangan_runding[]' class='form-control text-center' value='".htmlspecialchars($runding['kewangan_runding'])."'>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>No consultancy found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No consultancy found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='5'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -465,8 +505,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form action="save_publications.php" method="post">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -494,27 +534,36 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                         $query_run = mysqli_query($conn, $query);
                 
                         if(mysqli_num_rows($query_run) > 0){
-                
                             while($penerbitan = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$penerbitan[tajuk_terbit]</td>
-                            <td class='text-center p-1'>$penerbitan[tahun_terbit]</td>
-                            <td class='text-center p-1'>$penerbitan[jenis_terbit]</td>
-                            <td class='text-justify'>$penerbitan[penerbit]</td>
-                        </tr>";
+                                $i++;
+                                echo "
+                                <tr>
+                                    <td class='text-center p-1'>$i</td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='tajuk_terbit[]' class='form-control' value='".htmlspecialchars($penerbitan["tajuk_terbit"])."'>
+                                        <input type='hidden' name='penerbitan_id[]' value='".$penerbitan["id"]."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='tahun_terbit[]' class='form-control text-center' value='".htmlspecialchars($penerbitan["tahun_terbit"])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='jenis_terbit[]' class='form-control text-center' value='".htmlspecialchars($penerbitan["jenis_terbit"])."'>
+                                    </td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='penerbit[]' class='form-control' value='".htmlspecialchars($penerbitan["penerbit"])."'>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='6'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -525,8 +574,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form action="save_professional.php" method="post">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -556,25 +605,35 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                         if(mysqli_num_rows($query_run) > 0){
                 
                             while($prof = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$prof[badan_name]</td>
-                            <td class='text-center p-1'>$prof[badan_period]</td>
-                            <td class='text-center p-1'>$prof[badan_type]</td>
-                            <td class='text-center p-1'>$prof[peranan_badan]</td>
-                        </tr>";
+                            $i++;
+                            echo "
+                            <tr>
+                                <td class='text-center p-1'>$i</td>
+                                <td class='text-justify'>
+                                    <input type='text' name='badan_name[]' class='form-control' value='".htmlspecialchars($prof["badan_name"])."'>
+                                    <input type='hidden' name='badan_id[]' value='".$prof["id"]."'>
+                                </td>
+                                <td class='text-center p-1'>
+                                    <input type='text' name='badan_period[]' class='form-control text-center' value='".htmlspecialchars($prof["badan_period"])."'>
+                                </td>
+                                <td class='text-center p-1'>
+                                    <input type='text' name='badan_type[]' class='form-control text-center' value='".htmlspecialchars($prof["badan_type"])."'>
+                                </td>
+                                <td class='text-center p-1'>
+                                    <input type='text' name='peranan_badan[]' class='form-control text-center' value='".htmlspecialchars($prof["peranan_badan"])."'>
+                                </td>
+                            </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No professional body involvement found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='6'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -585,8 +644,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_involvement.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -612,35 +671,47 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <?php 
                     $i = 0;
                     if(isset($_GET['user_name'])){
-
-                        $libat_sarjana = mysqli_real_escape_string($conn, $_GET['user_name']);
-                        $query = "SELECT * FROM libat_sarjana WHERE user_name='$libat_sarjana'";
+                        $user_name = mysqli_real_escape_string($conn, $_GET['user_name']);
+                        $query = "SELECT * FROM libat_sarjana WHERE user_name='$user_name'";
                         $query_run = mysqli_query($conn, $query);
                 
                         if(mysqli_num_rows($query_run) > 0){
-                
                             while($sarjana = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$sarjana[kursus_nama]</td>
-                            <td class='text-center p-1'>$sarjana[sarjana_muda]</td>
-                            <td class='text-center p-1'>$sarjana[sarjana_prof]</td>
-                            <td class='text-center p-1'>$sarjana[tahun_pengajian]</td>
-                            <td class='text-center p-1'>$sarjana[tempoh_pengajaran]</td>
-                            <td class='text-center p-1'>$sarjana[peranan_sarjana]</td>
-                        </tr>";
+                                $i++;
+                                echo '
+                                <tr>
+                                    <td class="text-center p-1">'.$i.'</td>
+                                    <td class="text-justify">
+                                        <input type="text" name="kursus_nama[]" class="form-control" value="'.htmlspecialchars($sarjana["kursus_nama"]).'">
+                                        <input type="hidden" name="libat_sarjana_id[]" value="'.$sarjana["id"].'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="sarjana_muda[]" class="form-control text-center" value="'.htmlspecialchars($sarjana["sarjana_muda"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="sarjana_prof[]" class="form-control text-center" value="'.htmlspecialchars($sarjana["sarjana_prof"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="tahun_pengajian[]" class="form-control text-center" value="'.htmlspecialchars($sarjana["tahun_pengajian"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="tempoh_pengajaran[]" class="form-control text-center" value="'.htmlspecialchars($sarjana["tempoh_pengajaran"]).'">
+                                    </td>
+                                    <td class="text-center p-1">
+                                        <input type="text" name="peranan_sarjana[]" class="form-control text-center" value="'.htmlspecialchars($sarjana["peranan_sarjana"]).'">
+                                    </td>
+                                </tr>';
+                            }
+                        } else {
+                            echo "<tr><td colspan='7'>No records found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='7'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -649,11 +720,10 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
             <h4>Maklumat tentang tanggungjawab dalam bidang pengurusan akademik (disusun dari terbaru)</h4>
         </div>
         <br>
-        </div>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form action="save_academic_management.php" method="post">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -674,34 +744,42 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <tbody>
                     <?php 
                     $i = 0;
-                    if(isset($_GET['user_name'])){
-
-                        $urus_aca = mysqli_real_escape_string($conn, $_GET['user_name']);
-                        $query = "SELECT * FROM tanggungjawab_urus_aca WHERE user_name='$urus_aca'";
+                    if (isset($_GET['user_name'])) {
+                        $user_name = mysqli_real_escape_string($conn, $_GET['user_name']);
+                        $query = "SELECT * FROM tanggungjawab_urus_aca WHERE user_name='$user_name'";
                         $query_run = mysqli_query($conn, $query);
-                
-                        if(mysqli_num_rows($query_run) > 0){
-                
-                            while($acad = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$acad[tugas]</td>
-                            <td class='text-center p-1'>$acad[tempoh_urus]</td>
-                            <td class='text-center p-1'>$acad[pegawai_selia]</td>
-                            <td class='text-justify'>$acad[catatan]</td>
-                        </tr>";
+
+                        if (mysqli_num_rows($query_run) > 0) {
+                            while ($acad = mysqli_fetch_array($query_run)) {
+                                $i++;
+                                echo "
+                                <tr>
+                                    <td class='text-center p-1'>$i</td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='tugas[]' class='form-control' value='" . htmlspecialchars($acad['tugas']) . "'>
+                                        <input type='hidden' name='id[]' value='" . $acad['id'] . "'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='tempoh_urus[]' class='form-control text-center' value='" . htmlspecialchars($acad['tempoh_urus']) . "'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='pegawai_selia[]' class='form-control text-center' value='" . htmlspecialchars($acad['pegawai_selia']) . "'>
+                                    </td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='catatan[]' class='form-control' value='" . htmlspecialchars($acad['catatan']) . "'>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>No academic management records found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='5'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -712,8 +790,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_seminars.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -735,33 +813,41 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <?php 
                     $i = 0;
                     if(isset($_GET['user_name'])){
-
-                        $seminar = mysqli_real_escape_string($conn, $_GET['user_name']);
-                        $query = "SELECT * FROM seminar_latihan WHERE user_name='$seminar'";
+                        $seminar_name = mysqli_real_escape_string($conn, $_GET['user_name']);
+                        $query = "SELECT * FROM seminar_latihan WHERE user_name='$seminar_name'";
                         $query_run = mysqli_query($conn, $query);
                 
                         if(mysqli_num_rows($query_run) > 0){
-                
                             while($latihan = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$latihan[seminar_nama]</td>
-                            <td class='text-center p-1'>$latihan[tahun_seminar]</td>
-                            <td class='text-center p-1'>$latihan[penganjur_seminar]</td>
-                            <td class='text-justify'>$latihan[catatan_seminar]</td>
-                        </tr>";
+                                $i++;
+                                echo "
+                                <tr>
+                                    <td class='text-center p-1'>$i</td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='seminar_nama[]' class='form-control' value='".htmlspecialchars($latihan["seminar_nama"])."'>
+                                        <input type='hidden' name='seminar_id[]' value='".$latihan["id"]."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='tahun_seminar[]' class='form-control text-center' value='".htmlspecialchars($latihan["tahun_seminar"])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='penganjur_seminar[]' class='form-control text-center' value='".htmlspecialchars($latihan["penganjur_seminar"])."'>
+                                    </td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='catatan_seminar[]' class='form-control' value='".htmlspecialchars($latihan["catatan_seminar"])."'>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>No seminar or training records found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='5'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -772,8 +858,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_kerja_khidmat.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -794,34 +880,42 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <tbody>
                     <?php 
                     $i = 0;
-                    if(isset($_GET['user_name'])){
-
+                    if (isset($_GET['user_name'])) {
                         $khidmat = mysqli_real_escape_string($conn, $_GET['user_name']);
                         $query = "SELECT * FROM kerja_khidmat WHERE user_name='$khidmat'";
                         $query_run = mysqli_query($conn, $query);
                 
-                        if(mysqli_num_rows($query_run) > 0){
-                
-                            while($aktiviti = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-justify'>$aktiviti[jenis_aktiviti]</td>
-                            <td class='text-center p-1'>$aktiviti[tarikh_aktiviti]</td>
-                            <td class='text-center p-1'>$aktiviti[penganjur_aktiviti]</td>
-                            <td class='text-center p-1'>$aktiviti[peranan_aktiviti]</td>
-                        </tr>";
+                        if (mysqli_num_rows($query_run) > 0) {
+                            while ($aktiviti = mysqli_fetch_array($query_run)) {
+                                $i++;
+                                echo "
+                                <tr>
+                                    <td class='text-center p-1'>$i</td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='jenis_aktiviti[]' class='form-control' value='".htmlspecialchars($aktiviti['jenis_aktiviti'])."'>
+                                        <input type='hidden' name='id[]' value='".$aktiviti['id']."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='tarikh_aktiviti[]' class='form-control text-center' value='".htmlspecialchars($aktiviti['tarikh_aktiviti'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='penganjur_aktiviti[]' class='form-control text-center' value='".htmlspecialchars($aktiviti['penganjur_aktiviti'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='peranan_aktiviti[]' class='form-control text-center' value='".htmlspecialchars($aktiviti['peranan_aktiviti'])."'>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>No activities found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='5'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -832,8 +926,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form action="save_iproperty.php" method="post">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -856,35 +950,45 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     <tbody>
                     <?php 
                     $i = 0;
-                    if(isset($_GET['user_name'])){
-
+                    if (isset($_GET['user_name'])) {
                         $iproperty = mysqli_real_escape_string($conn, $_GET['user_name']);
                         $query = "SELECT * FROM iproperty WHERE user_name='$iproperty'";
                         $query_run = mysqli_query($conn, $query);
                 
-                        if(mysqli_num_rows($query_run) > 0){
-                
-                            while($ip = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-center p-1'>$ip[ip_id]</td>
-                            <td class='text-justify'>$ip[title_ip]</td>
-                            <td class='text-center p-1'>$ip[type_ip]</td>
-                            <td class='text-center p-1'>$ip[num_app]</td>
-                            <td class='text-center p-1'>$ip[role_ip]</td>
-                        </tr>";
+                        if (mysqli_num_rows($query_run) > 0) {
+                            while ($ip = mysqli_fetch_array($query_run)) {
+                                $i++;
+                                echo "
+                                <tr>
+                                    <td class='text-center p-1'>$i</td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='ip_id[]' class='form-control text-center' value='".htmlspecialchars($ip['ip_id'])."'>
+                                        <input type='hidden' name='id[]' value='".$ip['id']."'>
+                                    </td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='title_ip[]' class='form-control' value='".htmlspecialchars($ip['title_ip'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='type_ip[]' class='form-control text-center' value='".htmlspecialchars($ip['type_ip'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='num_app[]' class='form-control text-center' value='".htmlspecialchars($ip['num_app'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='role_ip[]' class='form-control text-center' value='".htmlspecialchars($ip['role_ip'])."'>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No intellectual property found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='6'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>
@@ -895,8 +999,8 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
         <br>
         <div class="col-12">
             <!-- Table Form start -->
-            <form action="" method="post">
-                <input type="hidden" name="" value="">
+            <form method="post" action="save_awards.php">
+                <input type="hidden" name="user_name" value="<?php echo isset($_GET['user_name']) ? htmlspecialchars($_GET['user_name']) : ''; ?>">
                 <table class='table table-hovered table-stripped table-bordered' id="form-tbl">
                     <colgroup>
                         <col width="5%">
@@ -919,32 +1023,42 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                     $i = 0;
                     if(isset($_GET['user_name'])){
 
-                        $awards = mysqli_real_escape_string($conn, $_GET['user_name']);
-                        $query = "SELECT * FROM awards WHERE user_name='$awards'";
+                        $awards_name = mysqli_real_escape_string($conn, $_GET['user_name']);
+                        $query = "SELECT * FROM awards WHERE user_name='$awards_name'";
                         $query_run = mysqli_query($conn, $query);
-                
+
                         if(mysqli_num_rows($query_run) > 0){
-                
-                            while($anugerah = mysqli_fetch_array($query_run)){
-                        $i++;
-                        echo "
-                        <tr>
-                            <td class='text-center p-1'>$i</td>
-                            <td class='text-center p-1'>$anugerah[tahun]</td>
-                            <td class='text-justify'>$anugerah[award_name]</td>
-                            <td class='text-justify'>$anugerah[penganugerah]</td>
-                            <td class='text-center p-1'>$anugerah[peringkat]</td>
-                        </tr>";
+
+                            while($award = mysqli_fetch_array($query_run)){
+                                $i++;
+                                echo "
+                                <tr>
+                                    <td class='text-center p-1'>$i</td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='year[]' class='form-control text-center' value='".htmlspecialchars($award['tahun'])."'>
+                                        <input type='hidden' name='award_id[]' value='".$award['id']."'>
+                                    </td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='award_name[]' class='form-control' value='".htmlspecialchars($award['award_name'])."'>
+                                    </td>
+                                    <td class='text-justify'>
+                                        <input type='text' name='penganugerah[]' class='form-control' value='".htmlspecialchars($award['penganugerah'])."'>
+                                    </td>
+                                    <td class='text-center p-1'>
+                                        <input type='text' name='peringkat[]' class='form-control text-center' value='".htmlspecialchars($award['peringkat'])."'>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>No awards found for this user.</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No publication found for this user.</td></tr>";
-                    }
-                    } else {
-                    echo "<tr><td colspan='6'>User not specified.</td></tr>";
+                        echo "<tr><td colspan='5'>User not specified.</td></tr>";
                     }
                     ?>
                     </tbody>
                 </table>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <!-- Table Form end -->
         </div>

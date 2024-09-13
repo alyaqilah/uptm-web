@@ -71,7 +71,7 @@ $result = mysqli_query($conn, $sql);
 
 <div class="sidebar">
     <a href="manage_users.php">Manage Users</a>
-    <a href="admin.php">Back To Home Page</a>
+    <a href="logout.php">Log Out</a>
 </div>
 
 <div class="content">
@@ -100,8 +100,8 @@ $result = mysqli_query($conn, $sql);
                         echo "<td>" . $row['user_name'] . "</td>";
                         echo "<td>" . $row['user_email'] . "</td>";
                         echo "<td>
-                                <a href='view_user.php?id=" . $row['id'] . "' class='btn btn-success btn-sm'>View</a>
-                                <a href='edit_user.php?id=" . $row['id'] . "' class='btn btn-primary btn-sm'>Edit</a> 
+                                <a href='/uptm-web/view_user.php?user_name=$row[user_name]' class='btn btn-success btn-sm'>View</a>
+                                <a href='/uptm-web/edit_user.php?user_name=$row[user_name]' class='btn btn-primary btn-sm'>Edit</a> 
                                 <a href='/uptm-web/users_save.php?deleteid=$row[id]' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>
                               </td>";
                         echo "</tr>";
