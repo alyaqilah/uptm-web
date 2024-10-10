@@ -18,6 +18,7 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <style>
     .sidebar {
         height: 100%;
@@ -67,12 +68,12 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
     <a href="manage_users.php">Manage Users</a>
 </div>
 
-<div class="content">
+<div class="content" id="resume">
     <?php include('message.php'); ?>
 
     <div class="row">
-    <a href="pdf_maker.php?user_name=<?php echo $data_row['user_name']; ?>&ACTION=VIEW" class="btn btn-success"><i class="fa fa-file-pdf-o"></i> View PDF</a> &nbsp;&nbsp; 
-    <a href="pdf_maker.php?user_name=<?php echo $data_row['user_name']; ?>&ACTION=DOWNLOAD" class="btn btn-danger"><i class="fa fa-download"></i> Download PDF</a>
+    <button id="downloadBtn">Download PDF</button>
+    <!-- <a id="downloadBtn" class="btn btn-danger"> Download PDF</a> -->
     <hr>
         <div class="col-12">
             <h3 class="text-center">Lecturer's Information</h3>
@@ -144,7 +145,7 @@ if(isset($_SESSION['id']) && isset($_SESSION['user_name'])) {
                         $contact = mysqli_fetch_array($query_run);
                         echo '
                         <tr>
-                            <td class="text-center p-1">'.$contact["name"].'</td>
+                            <td class="text-center p-1" data-name="'.$contact["name"].'" id="name">'.$contact["name"].'</td>
                             <td class="text-center p-1">'.$contact["position"].'</td>
                             <td class="text-center p-1">'.$contact["work_status"].'</td>
                             <td class="text-center p-1">'.$contact["nationality"].'</td>
